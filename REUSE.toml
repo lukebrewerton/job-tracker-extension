@@ -1,0 +1,26 @@
+# Copyright (C) 2026 Luke Brewerton
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Licence information for files that can't carry a header (https://reuse.software).
+# The code is AGPL-3.0-or-later (LICENSE); the icons are not: see https://job-tracker-docs.job-finder.dev/about/licence-and-branding/.
+version = 1
+
+[[annotations]]
+path = "src/icons/*.png"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Luke Brewerton"
+SPDX-License-Identifier = "CC-BY-NC-ND-4.0"
+
+# Everything else that can't carry a comment. Listed by name, not by glob, so a new file
+# without licence information still fails `make reuse-lint`: give it a header, or add it here.
+[[annotations]]
+path = [
+  "src/manifest.json",
+  "package.json",
+  "package-lock.json",
+  ".nvmrc",
+  "README.md",
+  "CLAUDE.md",
+]
+SPDX-FileCopyrightText = "2026 Luke Brewerton"
+SPDX-License-Identifier = "AGPL-3.0-or-later"

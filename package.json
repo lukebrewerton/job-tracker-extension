@@ -1,0 +1,15 @@
+{
+  "name": "job-tracker-extension",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Firefox extension for Job Tracker",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "prettier": "3.9.9",
+    "web-ext": "10.7.0"
+  }
+}

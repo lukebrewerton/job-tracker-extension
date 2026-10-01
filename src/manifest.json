@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Job Tracker",
+  "version": "0.1.0",
+  "description": "Adds the job you're viewing to your own Job Tracker instance in one click.",
+  "homepage_url": "https://github.com/lukebrewerton/job-tracker-extension",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Add to Job Tracker",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  },
+  "permissions": ["activeTab", "storage"],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "job-tracker@brewerton.me",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  }
+}
