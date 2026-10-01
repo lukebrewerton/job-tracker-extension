@@ -1,0 +1,15 @@
+# Copyright (C) 2026 Luke Brewerton
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Dependencies
+node_modules/
+
+# Packages built by `make build` (and signed ones, later)
+web-ext-artifacts/
+
+# Personal editor and Claude Code settings: never part of the project.
+.vscode/
+.claude/settings.local.json
+
+# macOS Finder metadata
+.DS_Store
