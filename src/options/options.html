@@ -1,0 +1,37 @@
+<!doctype html>
+<!--
+  Copyright (C) 2026 Luke Brewerton
+  SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Job Tracker options</title>
+    <link rel="stylesheet" href="options.css" />
+    <script type="module" src="options.js"></script>
+  </head>
+  <body>
+    <form id="form" novalidate>
+      <label for="instance-url">Your Job Tracker's address</label>
+      <p id="hint" class="hint">
+        The address you sign in to Job Tracker at. The toolbar button opens new
+        jobs there.
+      </p>
+      <div class="row">
+        <input
+          id="instance-url"
+          type="text"
+          inputmode="url"
+          autocomplete="url"
+          spellcheck="false"
+          placeholder="https://jobs.example.com"
+          aria-describedby="hint status"
+        />
+        <button type="submit">Save</button>
+      </div>
+      <p id="status" role="status"></p>
+      <a id="open" href="#" hidden>Open Job Tracker</a>
+    </form>
+  </body>
+</html>

@@ -1,7 +1,7 @@
 # Copyright (C) 2026 Luke Brewerton
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# CI: lint every PR to main, and re-run on every push to main.
+# CI: lint and test every PR to main, and re-run on every push to main.
 #
 # Security rules (see CLAUDE.md):
 #   - Never pull_request_target: fork PRs must never run with secrets or a write token.

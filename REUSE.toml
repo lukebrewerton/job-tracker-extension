@@ -18,6 +18,7 @@ path = [
   "src/manifest.json",
   "package.json",
   "package-lock.json",
+  "tsconfig.json",
   ".nvmrc",
   "README.md",
   "CLAUDE.md",

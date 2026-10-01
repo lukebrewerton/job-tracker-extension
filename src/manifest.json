@@ -17,6 +17,9 @@
       "32": "icons/icon-32.png"
     }
   },
+  "options_ui": {
+    "page": "options/options.html"
+  },
   "permissions": ["activeTab", "storage"],
   "browser_specific_settings": {
     "gecko": {
