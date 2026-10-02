@@ -20,7 +20,8 @@ new tab, and the app does the rest.
 - Manifest V3, Firefox 142+ (`strict_min_version`; the first version that supports
   `data_collection_permissions` on Android too)
 - Plain JavaScript (ES modules), **no build step**: `src/` is exactly what's packaged
-- Tooling: Node 24 (`.nvmrc`) · npm · **web-ext** (lint, run, build) · **prettier**
+- Tooling: Node 24 (`.nvmrc`) · npm · **web-ext** (lint, run, build) · **prettier** ·
+  **tsc** (`// @ts-check` + JSDoc, `@types/firefox-webext-browser`) · **Vitest** (`tests/`, never packaged)
 
 ## Conventions
 
@@ -38,7 +39,7 @@ new tab, and the app does the rest.
 - Jira project **JT** (shared with the app). Branches: `<type>/JT-<n>`, e.g. `feat/JT-39`.
 - Commit subjects: conventional-commit style, imperative mood.
 - Everything reaches `main` through a PR; CI must pass.
-- CI (`.github/workflows/ci.yml`) runs jobs `lint`, `reuse-lint`, `secrets-scan` — each calls
+- CI (`.github/workflows/ci.yml`) runs jobs `lint`, `test`, `reuse-lint`, `secrets-scan` — each calls
   the matching `make` target. Job names are required status checks: don't rename them
   without updating the ruleset.
 - **Never use `pull_request_target`**, and never let CI reference secrets. (Signing, later,
@@ -48,7 +49,8 @@ new tab, and the app does the rest.
 ## Common commands
 
 - `make sync` — install the dev dependencies (`npm ci`)
-- `make lint` — `web-ext lint` (warnings fail) and `prettier --check`
+- `make lint` — `web-ext lint` (warnings fail), `tsc` and `prettier --check`
+- `make test` — the unit tests (Vitest)
 - `make format` — `prettier --write`
 - `make run` — run the extension in a temporary Firefox profile, reloading on change
 - `make build` — an unsigned package in `web-ext-artifacts/`
@@ -57,6 +59,6 @@ new tab, and the app does the rest.
 
 ## Definition of done (every change)
 
-1. `make lint` and `make reuse-lint` pass.
+1. `make lint`, `make test` and `make reuse-lint` pass.
 2. The extension loads and works as a temporary add-on in Firefox.
 3. Licence information on every new file: an SPDX header, or an entry in `REUSE.toml`.

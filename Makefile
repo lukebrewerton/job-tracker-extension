@@ -3,7 +3,7 @@
 #
 # Job Tracker extension: common tasks. `make help` lists them.
 
-.PHONY: help sync lint format run build reuse-lint secrets-scan hooks hooks-off
+.PHONY: help sync lint test format run build reuse-lint secrets-scan hooks hooks-off
 
 .DEFAULT_GOAL := help
 
@@ -17,9 +17,13 @@ help: ## List the targets
 sync: ## Install the dev dependencies (npm ci)
 	npm ci
 
-lint: ## Lint the extension (web-ext) and check formatting (prettier)
+lint: ## Lint the extension (web-ext), type-check (tsc) and check formatting (prettier)
 	$(WEB_EXT) lint --source-dir $(SRC) --warnings-as-errors
+	npx --no-install tsc
 	npx --no-install prettier --check .
+
+test: ## Run the unit tests (Vitest)
+	npx --no-install vitest run
 
 format: ## Format everything with prettier
 	npx --no-install prettier --write .

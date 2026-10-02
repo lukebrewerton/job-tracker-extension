@@ -13,6 +13,13 @@ instance's address is a setting with no default.
 
 > In development: the toolbar button doesn't do anything yet.
 
+## Setting it up
+
+Open `about:addons`, choose **Job Tracker** → **Preferences**, and enter the address you sign
+in to Job Tracker at, such as `https://jobs.example.com`. Only `https://` addresses are
+accepted, apart from `http://localhost` for a development instance. The setting is saved with
+your Firefox account if you use sync.
+
 ## Development
 
 Needs Node 24 (`.nvmrc`) and Firefox 142 or newer.
@@ -20,7 +27,8 @@ Needs Node 24 (`.nvmrc`) and Firefox 142 or newer.
 ```sh
 make sync   # install the dev dependencies
 make run    # run it in a temporary Firefox profile, reloading on change
-make lint   # web-ext lint and prettier, as CI runs them
+make lint   # web-ext lint, tsc and prettier, as CI runs them
+make test   # the unit tests (Vitest)
 make build  # an unsigned package in web-ext-artifacts/
 ```
 
