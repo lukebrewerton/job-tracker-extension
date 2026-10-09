@@ -11,7 +11,8 @@ It's a link-opener, not an API client: it asks only for the `activeTab` and `sto
 permissions, stores no credentials, and talks to nothing but the tab it opens. Your
 instance's address is a setting with no default.
 
-> In development: the toolbar button doesn't do anything yet.
+> In development: there's no signed build to install yet, so load it as a temporary add-on
+> (see [Development](#development)).
 
 ## Setting it up
 
@@ -19,6 +20,15 @@ Open `about:addons`, choose **Job Tracker** → **Preferences**, and enter the a
 in to Job Tracker at, such as `https://jobs.example.com`. Only `https://` addresses are
 accepted, apart from `http://localhost` for a development instance. The setting is saved with
 your Firefox account if you use sync.
+
+## Using it
+
+On a job advert, click the Job Tracker button in the toolbar. Your instance's new-job form
+opens in a new tab, with the advert's address and title filled in. On LinkedIn the company
+is filled in too, and LinkedIn's and Indeed's own names are left out of the role. Jobs opened from LinkedIn or
+Indeed search results are saved with the job's own address, not the search's. If you're
+signed out, you sign in first and then land on the filled-in form. Until an address is set,
+the button opens the settings instead.
 
 ## Development
 
