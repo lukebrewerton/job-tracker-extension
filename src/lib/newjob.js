@@ -3,8 +3,9 @@
 // @ts-check
 
 // The page the toolbar button opens: the instance's new-job form, pre-filled from the
-// current tab's address and title. Only what the browser already knows about the tab is
-// used — no content script, nothing read from the page itself.
+// current tab's address and title (and the company, where the title gives it). Only what
+// the browser already knows about the tab is used — no content script, nothing read from
+// the page itself.
 
 /**
  * The job advert's address, or undefined if the tab isn't a web page (about:, file:,
@@ -55,13 +56,46 @@ export function jobPageUrl(tabUrl) {
 }
 
 /**
- * The tab's title, trimmed and without a leading notification count such as "(3) ".
+ * The role (and, where the site's title says, the company) from the tab's title: trimmed,
+ * without a leading notification count such as "(3) ", and without the site's name.
  *
+ * - LinkedIn: "Role | Company | LinkedIn".
+ * - Indeed: "Role - Location - Indeed" on a job's page (the location is dropped); a search
+ *   page's "Job Search | Indeed" isn't a role at all.
+ * - Anywhere else, the whole title is the role.
+ *
+ * @param {string} jobUrl The job's address, from jobPageUrl().
  * @param {string} tabTitle
- * @returns {string}
+ * @returns {{ role: string, company: string }}
  */
-export function jobTitle(tabTitle) {
-  return tabTitle.trim().replace(/^\(\d+\+?\)\s*/, "");
+export function fromTitle(jobUrl, tabTitle) {
+  const title = tabTitle.trim().replace(/^\(\d+\+?\)\s*/, "");
+  const host = new URL(jobUrl).hostname;
+
+  if (/(^|\.)linkedin\.com$/.test(host)) {
+    const parts = title.split(" | ");
+    if (parts.length >= 2 && parts.at(-1) === "LinkedIn") {
+      parts.pop();
+      const company = parts.length >= 2 ? (parts.pop() ?? "") : "";
+      return { role: parts.join(" | "), company };
+    }
+  }
+
+  if (/(^|\.)indeed\.[a-z.]+$/.test(host)) {
+    if (/ \| Indeed(\.com)?$/.test(title)) {
+      return { role: "", company: "" };
+    }
+    const match = / - Indeed(\.com)?$/.exec(title);
+    if (match !== null) {
+      const parts = title.slice(0, match.index).split(" - ");
+      if (parts.length >= 2) {
+        parts.pop();
+      }
+      return { role: parts.join(" - "), company: "" };
+    }
+  }
+
+  return { role: title, company: "" };
 }
 
 /**
@@ -80,9 +114,12 @@ export function newJobUrl(origin, tabUrl, tabTitle) {
     return target.href;
   }
   target.searchParams.set("url", url);
-  const title = tabTitle === undefined ? "" : jobTitle(tabTitle);
-  if (title !== "") {
-    target.searchParams.set("title", title);
+  const { role, company } = fromTitle(url, tabTitle ?? "");
+  if (role !== "") {
+    target.searchParams.set("title", role);
+  }
+  if (company !== "") {
+    target.searchParams.set("company", company);
   }
   return target.href;
 }

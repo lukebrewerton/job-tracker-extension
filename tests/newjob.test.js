@@ -9,7 +9,7 @@ import { newJobUrl } from "../src/lib/newjob.js";
 const INSTANCE = "https://jobs.example.com";
 
 /**
- * The url and title newJobUrl() pre-fills, decoded (null when not set).
+ * The url, title and company newJobUrl() pre-fills, decoded (null when not set).
  *
  * @param {string | undefined} tabUrl
  * @param {string | undefined} tabTitle
@@ -20,6 +20,7 @@ function prefill(tabUrl, tabTitle) {
   return {
     url: target.searchParams.get("url"),
     title: target.searchParams.get("title"),
+    company: target.searchParams.get("company"),
   };
 }
 
@@ -96,22 +97,56 @@ describe("newJobUrl", () => {
     expect(newJobUrl(INSTANCE, tabUrl, "New Tab")).toBe(`${INSTANCE}/jobs/new`);
   });
 
+  const CAREERS = "https://careers.example.com/jobs/42";
+  const LINKEDIN = "https://www.linkedin.com/jobs/view/4012345678/";
+  const INDEED = "https://uk.indeed.com/viewjob?jk=0a1b2c3d4e5f6789";
+
   test.each([
-    ["Senior SRE", "Senior SRE"],
-    ["  Senior SRE | Globex | LinkedIn  ", "Senior SRE | Globex | LinkedIn"],
+    // Anywhere else, the whole title is the role.
+    [CAREERS, "Senior SRE", "Senior SRE", null],
+    [CAREERS, "  Senior SRE | Globex  ", "Senior SRE | Globex", null],
+    [
+      CAREERS,
+      "Senior SRE - London - Indeed",
+      "Senior SRE - London - Indeed",
+      null,
+    ],
+    [CAREERS, "Senior SRE (Remote)", "Senior SRE (Remote)", null],
     // A leading notification count is dropped.
-    ["(3) Senior SRE | Globex | LinkedIn", "Senior SRE | Globex | LinkedIn"],
-    ["(99+) Senior SRE", "Senior SRE"],
-    ["Senior SRE (Remote)", "Senior SRE (Remote)"],
+    [CAREERS, "(99+) Senior SRE", "Senior SRE", null],
     // Characters that need encoding survive the round trip.
-    ["C++ & Rust engineer: 50% remote?", "C++ & Rust engineer: 50% remote?"],
-    ["   ", null],
-    [undefined, null],
-  ])("pre-fills the title %j as %j", (tabTitle, title) => {
-    expect(prefill("https://careers.example.com/jobs/42", tabTitle).title).toBe(
-      title,
-    );
-  });
+    [CAREERS, "C++ & Rust: 50% remote?", "C++ & Rust: 50% remote?", null],
+    [CAREERS, "   ", null, null],
+    [CAREERS, undefined, null, null],
+    // LinkedIn: "Role | Company | LinkedIn".
+    [LINKEDIN, "Senior SRE | Globex | LinkedIn", "Senior SRE", "Globex"],
+    [LINKEDIN, "(3) Senior SRE | Globex | LinkedIn", "Senior SRE", "Globex"],
+    [
+      LINKEDIN,
+      "SRE | Platform | Globex | LinkedIn",
+      "SRE | Platform",
+      "Globex",
+    ],
+    [
+      LINKEDIN,
+      "Senior SRE jobs in London | LinkedIn",
+      "Senior SRE jobs in London",
+      null,
+    ],
+    [LINKEDIN, "Senior SRE | Globex", "Senior SRE | Globex", null],
+    // Indeed: "Role - Location - Indeed" on a job's page; the location is dropped.
+    [INDEED, "Senior SRE - London (Hybrid) - Indeed", "Senior SRE", null],
+    [INDEED, "SRE - Platform - Remote - Indeed.com", "SRE - Platform", null],
+    [INDEED, "Senior SRE - Indeed", "Senior SRE", null],
+    // A search page's title isn't a role.
+    [INDEED, "Job Search | Indeed", null, null],
+    [INDEED, "Senior SRE", "Senior SRE", null],
+  ])(
+    "on %s, pre-fills the title %j as role %j and company %j",
+    (url, tabTitle, title, company) => {
+      expect(prefill(url, tabTitle)).toEqual({ url, title, company });
+    },
+  );
 
   test("works with a local development instance", () => {
     expect(
