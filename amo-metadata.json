@@ -1,8 +1,6 @@
 {
   "categories": {
-    "firefox": [
-      "other"
-    ]
+    "firefox": ["other"]
   },
   "summary": {
     "en-US": "Adds the job advert you're viewing to your own self-hosted Job Tracker in one click: its link, title and, on LinkedIn, the company. Needs your own Job Tracker instance."
