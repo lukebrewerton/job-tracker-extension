@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # Release when the version changes: a push to main whose version (src/manifest.json, kept in
-# step with package.json by `make version-check`) has no release yet is signed by AMO on the
-# unlisted channel, then released as tag `v<version>` with the signed .xpi and updates.json
-# attached. Firefox checks that updates.json (the manifest's update_url) for new versions.
+# step with package.json by `make version-check`) has no release yet is submitted to
+# addons.mozilla.org as a new listed version (amo-metadata.json supplies the listing's
+# summary, category and licence), then tagged `v<version>` with a GitHub release. AMO
+# reviews and publishes the version, and Firefox updates installed copies from there.
 # Pushes that don't change the version release nothing. Releasing: bump the version in a PR,
 # `chore: release X.Y.Z`.
 #
@@ -59,8 +60,7 @@ jobs:
     needs: check
     if: needs.check.outputs.release == 'true'
     runs-on: ubuntu-24.04
-    # AMO usually signs an unlisted version within minutes; web-ext waits up to 20.
-    timeout-minutes: 30
+    timeout-minutes: 15
     environment: amo
     permissions:
       contents: write
@@ -75,21 +75,20 @@ jobs:
           node-version-file: .nvmrc
       # No install scripts: nothing from the dependency tree runs before the secrets are used.
       - run: npm ci --ignore-scripts
-      - name: Sign with AMO (unlisted)
+      # Submits the version and returns once AMO has validated it, without waiting for
+      # review: AMO publishes it when approved. Fails (before any release) if AMO rejects it.
+      - name: Submit to AMO (listed)
         env:
           WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
           WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
         run: >-
-          npx --no-install web-ext sign --source-dir src --channel unlisted
-          --artifacts-dir signed --approval-timeout 1200000
+          npx --no-install web-ext sign --source-dir src --channel listed
+          --amo-metadata amo-metadata.json --approval-timeout 0
       - name: Release v${{ needs.check.outputs.version }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          xpi="signed/job-tracker-$VERSION.xpi"
-          mv signed/*.xpi "$xpi"
-          node scripts/updates-json.mjs "$xpi" > updates.json
-          cat updates.json
-          gh release create "v$VERSION" "$xpi" updates.json \
-            --target "$GITHUB_SHA" --title "v$VERSION" --generate-notes
+          gh release create "v$VERSION" --target "$GITHUB_SHA" --title "v$VERSION" \
+            --notes "Submitted to addons.mozilla.org: Firefox updates to it once Mozilla has approved it. Installing: https://job-tracker-docs.job-finder.dev/using/browser-extension/" \
+            --generate-notes

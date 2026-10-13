@@ -1,0 +1,12 @@
+{
+  "categories": {
+    "firefox": ["other"]
+  },
+  "summary": {
+    "en-US": "Adds the job advert you're viewing to your own self-hosted Job Tracker in one click: its link, title and, on LinkedIn, the company. Needs a Job Tracker instance (https://github.com/lukebrewerton/job-tracker)."
+  },
+  "version": {
+    "license": "AGPL-3.0-only",
+    "approval_notes": "Companion to Job Tracker, a self-hosted job application tracker (https://github.com/lukebrewerton/job-tracker). The toolbar button opens <instance>/jobs/new?url=…&title=… in a new tab, using only the active tab's URL and title (activeTab); the instance address is a setting (storage.sync) with no default. It makes no network requests itself. To try it without an instance, save any https:// address in the options and select the button on a web page: a new tab opens at that address's /jobs/new with the page's URL and title in the query. Plain JavaScript, no build step or minification: the package is the source (https://github.com/lukebrewerton/job-tracker-extension)."
+  }
+}

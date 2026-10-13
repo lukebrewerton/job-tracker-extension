@@ -16,6 +16,7 @@ SPDX-License-Identifier = "CC-BY-NC-ND-4.0"
 [[annotations]]
 path = [
   "src/manifest.json",
+  "amo-metadata.json",
   "package.json",
   "package-lock.json",
   "tsconfig.json",

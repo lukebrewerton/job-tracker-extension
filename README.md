@@ -1,4 +1,4 @@
-# Job Tracker for Firefox
+# Job Tracker Companion for Firefox
 
 [![CI](https://img.shields.io/github/actions/workflow/status/lukebrewerton/job-tracker-extension/ci.yml?branch=main&label=CI)](https://github.com/lukebrewerton/job-tracker-extension/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/lukebrewerton/job-tracker-extension)](https://github.com/lukebrewerton/job-tracker-extension/releases/latest)
@@ -13,19 +13,13 @@ instance's address is a setting with no default.
 
 ## Installing it
 
-Needs Firefox 142 or newer. The extension is signed by Mozilla but not listed on
-addons.mozilla.org, so it's installed from this repo's releases:
-
-1. Open the [latest release](https://github.com/lukebrewerton/job-tracker-extension/releases/latest)
-   and select the `job-tracker-<version>.xpi` file.
-2. Firefox asks whether to add Job Tracker. Choose **Add**. If the file downloads instead, open
-   `about:addons`, select the cog, choose **Install Add-on From File…** and pick it.
-
-Firefox keeps it up to date from then on: it checks this repo's latest release for new versions.
+Needs Firefox 142 or newer. Install **Job Tracker Companion** from addons.mozilla.org: see
+[Browser extension](https://job-tracker-docs.job-finder.dev/using/browser-extension/) in the
+Job Tracker manual. Firefox keeps it up to date.
 
 ## Setting it up
 
-Open `about:addons`, choose **Job Tracker** → **Preferences**, and enter the address you sign
+Open `about:addons`, choose **Job Tracker Companion** → **Preferences**, and enter the address you sign
 in to Job Tracker at, such as `https://jobs.example.com`. Only `https://` addresses are
 accepted, apart from `http://localhost` for a development instance. The setting is saved with
 your Firefox account if you use sync.
@@ -55,12 +49,9 @@ make build  # an unsigned package in web-ext-artifacts/
 
 Bump the version in `src/manifest.json` and `package.json` (`npm version X.Y.Z
 --no-git-tag-version` does both) in a PR titled `chore: release X.Y.Z`. When it's merged, the
-release workflow has the build signed by Mozilla (unlisted) and publishes release `vX.Y.Z` with
-the signed `.xpi` and `updates.json`, which installed copies check for updates.
-
-To load it into your everyday Firefox instead, open `about:debugging#/runtime/this-firefox`,
-choose **Load Temporary Add-on…** and pick `src/manifest.json`. It stays until Firefox
-restarts.
+release workflow submits it to addons.mozilla.org as a new version of the listing (its
+summary, category and licence come from `amo-metadata.json`) and publishes release `vX.Y.Z`.
+Mozilla reviews the version, and Firefox updates to it once it's approved.
 
 ## Licence
 

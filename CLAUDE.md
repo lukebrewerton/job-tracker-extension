@@ -12,10 +12,11 @@ new tab, and the app does the rest.
   credentials, no requests to the instance, no CORS.
 - **The instance URL is a user setting with no default.** Never hardcode an instance URL,
   including `job-tracker.job-finder.dev`.
-- Signed builds come from AMO's **unlisted** channel through CI (`release.yml`), and are
-  installed from GitHub releases. Firefox updates them from the release's `updates.json`
-  (the manifest's `update_url`). The add-on ID (`browser_specific_settings.gecko.id`) is
-  fixed now that AMO has signed it.
+- Published on addons.mozilla.org as **Job Tracker Companion** (listed), submitted by CI
+  (`release.yml`); AMO reviews each version and Firefox updates installed copies. The listing's
+  summary, category, licence (AGPL-3.0-only: AMO has no -or-later) and reviewer notes come
+  from `amo-metadata.json` on every submission, so change them there, not in the Developer
+  Hub. The add-on ID (`browser_specific_settings.gecko.id`) never changes.
 
 ## Stack
 
@@ -45,15 +46,15 @@ new tab, and the app does the rest.
   the matching `make` target. Job names are required status checks: don't rename them
   without updating the ruleset.
 - **Never use `pull_request_target`**, and never let CI reference secrets. **One exception:**
-  `release.yml`'s `release` job signs with AMO, using `AMO_JWT_ISSUER` / `AMO_JWT_SECRET` from
+  `release.yml`'s `release` job submits to AMO, using `AMO_JWT_ISSUER` / `AMO_JWT_SECRET` from
   the `amo` Environment (deployments from `main` only). It runs only on pushes to `main`, when
   the version has no release yet, installs with `npm ci --ignore-scripts`, and its
   `GITHUB_TOKEN` can write contents only, to create the release. Nothing else may reference
   secrets.
 - **Releases:** one version, MAJOR.MINOR.PATCH, in `src/manifest.json` and `package.json`
   (`make version-check`, part of `make lint`). Bumping it in a PR (`chore: release X.Y.Z`)
-  releases it on merge. AMO refuses a version it has already signed, so a failed release is
-  retried with a new version.
+  releases it on merge. AMO refuses a version number it has already had, so a release that
+  fails after submitting is retried with a new version.
 - **Never commit secrets.**
 
 ## Common commands

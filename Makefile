@@ -18,7 +18,7 @@ sync: ## Install the dev dependencies (npm ci)
 	npm ci
 
 lint: ## Lint the extension (web-ext), type-check (tsc), check formatting (prettier) and the version
-	$(WEB_EXT) lint --source-dir $(SRC) --self-hosted --warnings-as-errors
+	$(WEB_EXT) lint --source-dir $(SRC) --warnings-as-errors
 	npx --no-install tsc
 	npx --no-install tsc -p scripts
 	npx --no-install prettier --check .
