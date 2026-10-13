@@ -1,0 +1,95 @@
+# Copyright (C) 2026 Luke Brewerton
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Release when the version changes: a push to main whose version (src/manifest.json, kept in
+# step with package.json by `make version-check`) has no release yet is signed by AMO on the
+# unlisted channel, then released as tag `v<version>` with the signed .xpi and updates.json
+# attached. Firefox checks that updates.json (the manifest's update_url) for new versions.
+# Pushes that don't change the version release nothing. Releasing: bump the version in a PR,
+# `chore: release X.Y.Z`.
+#
+# Security (CLAUDE.md): the only workflow that uses secrets. It runs only on pushes to main,
+# never on PR code. The AMO API key and secret live in the `amo` Environment, which only main
+# can use, and only the `release` job (which runs only when there's something to release)
+# reads them. That job installs dependencies without running their install scripts, checks
+# out main without persisting the token, and uses no third-party actions beyond the pinned
+# checkout and setup-node. Its GITHUB_TOKEN can write contents only, to create the release.
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  # No secrets: decide whether this version still needs releasing.
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      release: ${{ steps.version.outputs.release }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version=$(jq -r .version src/manifest.json)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if gh release view "v$version" > /dev/null 2>&1; then
+            echo "v$version is already released: nothing to do."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  release:
+    needs: check
+    if: needs.check.outputs.release == 'true'
+    runs-on: ubuntu-24.04
+    # AMO usually signs an unlisted version within minutes; web-ext waits up to 20.
+    timeout-minutes: 30
+    environment: amo
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+      # No install scripts: nothing from the dependency tree runs before the secrets are used.
+      - run: npm ci --ignore-scripts
+      - name: Sign with AMO (unlisted)
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: >-
+          npx --no-install web-ext sign --source-dir src --channel unlisted
+          --artifacts-dir signed --approval-timeout 1200000
+      - name: Release v${{ needs.check.outputs.version }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          xpi="signed/job-tracker-$VERSION.xpi"
+          mv signed/*.xpi "$xpi"
+          node scripts/updates-json.mjs "$xpi" > updates.json
+          cat updates.json
+          gh release create "v$VERSION" "$xpi" updates.json \
+            --target "$GITHUB_SHA" --title "v$VERSION" --generate-notes

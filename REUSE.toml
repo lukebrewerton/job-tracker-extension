@@ -19,6 +19,7 @@ path = [
   "package.json",
   "package-lock.json",
   "tsconfig.json",
+  "scripts/tsconfig.json",
   ".nvmrc",
   "README.md",
   "CLAUDE.md",

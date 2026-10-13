@@ -12,8 +12,10 @@ new tab, and the app does the rest.
   credentials, no requests to the instance, no CORS.
 - **The instance URL is a user setting with no default.** Never hardcode an instance URL,
   including `job-tracker.job-finder.dev`.
-- Signed builds come from AMO's unlisted channel through CI (later). The add-on ID
-  (`browser_specific_settings.gecko.id`) is fixed once AMO has signed it.
+- Signed builds come from AMO's **unlisted** channel through CI (`release.yml`), and are
+  installed from GitHub releases. Firefox updates them from the release's `updates.json`
+  (the manifest's `update_url`). The add-on ID (`browser_specific_settings.gecko.id`) is
+  fixed now that AMO has signed it.
 
 ## Stack
 
@@ -42,8 +44,16 @@ new tab, and the app does the rest.
 - CI (`.github/workflows/ci.yml`) runs jobs `lint`, `test`, `reuse-lint`, `secrets-scan` — each calls
   the matching `make` target. Job names are required status checks: don't rename them
   without updating the ruleset.
-- **Never use `pull_request_target`**, and never let CI reference secrets. (Signing, later,
-  will be the one tag-only exception.)
+- **Never use `pull_request_target`**, and never let CI reference secrets. **One exception:**
+  `release.yml`'s `release` job signs with AMO, using `AMO_JWT_ISSUER` / `AMO_JWT_SECRET` from
+  the `amo` Environment (deployments from `main` only). It runs only on pushes to `main`, when
+  the version has no release yet, installs with `npm ci --ignore-scripts`, and its
+  `GITHUB_TOKEN` can write contents only, to create the release. Nothing else may reference
+  secrets.
+- **Releases:** one version, MAJOR.MINOR.PATCH, in `src/manifest.json` and `package.json`
+  (`make version-check`, part of `make lint`). Bumping it in a PR (`chore: release X.Y.Z`)
+  releases it on merge. AMO refuses a version it has already signed, so a failed release is
+  retried with a new version.
 - **Never commit secrets.**
 
 ## Common commands
@@ -54,6 +64,7 @@ new tab, and the app does the rest.
 - `make format` — `prettier --write`
 - `make run` — run the extension in a temporary Firefox profile, reloading on change
 - `make build` — an unsigned package in `web-ext-artifacts/`
+- `make version-check` — the two version numbers agree and are MAJOR.MINOR.PATCH
 - `make reuse-lint` / `make secrets-scan` — REUSE and gitleaks (pinned Docker images, as CI)
 - `make hooks` / `make hooks-off` — opt in/out of the pre-commit secrets hook
 
