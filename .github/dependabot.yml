@@ -22,6 +22,10 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    # Types must match the Node runtime (24 LTS, .nvmrc). Major moves are manual.
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     groups:
       npm-minor-patch:
         patterns: ["*"]

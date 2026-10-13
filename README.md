@@ -1,7 +1,7 @@
-# Job Tracker for Firefox
+# Job Tracker Companion for Firefox
 
 [![CI](https://img.shields.io/github/actions/workflow/status/lukebrewerton/job-tracker-extension/ci.yml?branch=main&label=CI)](https://github.com/lukebrewerton/job-tracker-extension/actions/workflows/ci.yml)
-![Development status](https://img.shields.io/badge/development_status-in_development-orange)
+[![Release](https://img.shields.io/github/v/release/lukebrewerton/job-tracker-extension)](https://github.com/lukebrewerton/job-tracker-extension/releases/latest)
 
 A Firefox extension for [Job Tracker](https://github.com/lukebrewerton/job-tracker). One click
 on a job advert opens the new-job page on **your own** Job Tracker instance, with the advert's
@@ -11,12 +11,15 @@ It's a link-opener, not an API client: it asks only for the `activeTab` and `sto
 permissions, stores no credentials, and talks to nothing but the tab it opens. Your
 instance's address is a setting with no default.
 
-> In development: there's no signed build to install yet, so load it as a temporary add-on
-> (see [Development](#development)).
+## Installing it
+
+Needs Firefox 142 or newer. Install **Job Tracker Companion** from addons.mozilla.org: see
+[Browser extension](https://job-tracker-docs.job-finder.dev/using/browser-extension/) in the
+Job Tracker manual. Firefox keeps it up to date.
 
 ## Setting it up
 
-Open `about:addons`, choose **Job Tracker** → **Preferences**, and enter the address you sign
+Open `about:addons`, choose **Job Tracker Companion** → **Preferences**, and enter the address you sign
 in to Job Tracker at, such as `https://jobs.example.com`. Only `https://` addresses are
 accepted, apart from `http://localhost` for a development instance. The setting is saved with
 your Firefox account if you use sync.
@@ -42,9 +45,13 @@ make test   # the unit tests (Vitest)
 make build  # an unsigned package in web-ext-artifacts/
 ```
 
-To load it into your everyday Firefox instead, open `about:debugging#/runtime/this-firefox`,
-choose **Load Temporary Add-on…** and pick `src/manifest.json`. It stays until Firefox
-restarts.
+### Releasing
+
+Bump the version in `src/manifest.json` and `package.json` (`npm version X.Y.Z
+--no-git-tag-version` does both) in a PR titled `chore: release X.Y.Z`. When it's merged, the
+release workflow submits it to addons.mozilla.org as a new version of the listing (its
+summary, category and licence come from `amo-metadata.json`) and publishes release `vX.Y.Z`.
+Mozilla reviews the version, and Firefox updates to it once it's approved.
 
 ## Licence
 

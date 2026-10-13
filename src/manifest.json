@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Job Tracker",
-  "version": "0.1.0",
+  "name": "Job Tracker Companion",
+  "version": "1.0.0",
   "description": "Adds the job you're viewing to your own Job Tracker instance in one click.",
   "homepage_url": "https://github.com/lukebrewerton/job-tracker-extension",
   "icons": {
